@@ -1,25 +1,26 @@
 {
 	"schema_version": 1,
 	"quilt_loader": {
-		"group": "com.example",
-		"id": "example_mod",
+		"group": "baguchan.enchantwithmob",
+		"id": "enchantwithmob",
 		"version": "${version}",
 		"metadata": {
-			"name": "Mod Name",
-			"description": "A short description of your mod.",
+			"name": "EnchantWithMob",
+			"description": "This mod is add Enchant (with Mob) from Minecraft Dungeons.",
 			"contributors": {
-				"Me!": "Owner"
+				"bagu_chan": "Owner"
 			},
 			"contact": {
-				"homepage": "https://example.com/",
-				"issues": "https://github.com/QuiltMC/quilt-template-mod/issues",
-				"sources": "https://github.com/QuiltMC/quilt-template-mod"
+				"homepage": "https://www.curseforge.com/minecraft/mc-mods/enchant-with-mob",
+				"issues": "https://github.com/baguchan/EnchantWithMob-Forge/issues",
+				"sources": "https://github.com/baguchan/EnchantWithMob-Forge"
 			},
-			"icon": "assets/example_mod/icon.png"
+			"icon": "assets/enchantwithmob/icon.png"
 		},
 		"intermediate_mappings": "net.fabricmc:intermediary",
 		"entrypoints": {
-			"init": "com.example.example_mod.ExampleMod"
+			"init": "baguchan.enchantwithmob.EnchantWithMob",
+			"client": "baguchan.enchantwithmob.client.EnchantWithMobClient"
 		},
 		"depends": [
 			{
@@ -36,5 +37,5 @@
 			}
 		]
 	},
-	"mixin": "example_mod.mixins.json"
+	"mixin": "enchantwithmob.mixins.json"
 }
