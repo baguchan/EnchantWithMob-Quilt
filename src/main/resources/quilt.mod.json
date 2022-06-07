@@ -19,9 +19,7 @@
 		},
 		"intermediate_mappings": "net.fabricmc:intermediary",
 		"entrypoints": {
-			"init": "baguchan.enchantwithmob.EnchantWithMob",
-			"client": "baguchan.enchantwithmob.client.EnchantWithMobClient",
-			"server": "baguchan.enchantwithmob.EnchantWithMobServer"
+			"init": "baguchan.enchantwithmob.EnchantWithMob"
 		},
 		"depends": [
 			{
