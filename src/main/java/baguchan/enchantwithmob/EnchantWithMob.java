@@ -3,6 +3,7 @@ package baguchan.enchantwithmob;
 import baguchan.enchantwithmob.registry.MobEnchants;
 import baguchan.enchantwithmob.registry.ModItems;
 import baguchan.enchantwithmob.registry.ModRegistry;
+import baguchan.enchantwithmob.registry.ModTrackedDatas;
 import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
 import org.slf4j.Logger;
@@ -20,5 +21,6 @@ public class EnchantWithMob implements ModInitializer {
 		ModRegistry.init();
 		MobEnchants.init();
 		ModItems.init();
+		ModTrackedDatas.init();
 	}
 }

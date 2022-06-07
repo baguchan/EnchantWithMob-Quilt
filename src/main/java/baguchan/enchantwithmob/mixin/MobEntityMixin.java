@@ -37,28 +37,30 @@ public abstract class MobEntityMixin extends LivingEntity implements IEnchantCap
 
 		if (isSpawnEnchantableEntity(this)) {
 			if (spawnReason != SpawnReason.BREEDING && spawnReason != SpawnReason.CONVERSION && spawnReason != SpawnReason.STRUCTURE) {
-				if (!world.isClient()) {
-					int i = 0;
-					float difficultScale = world.getLocalDifficulty(this.getBlockPos()).getLocalDifficulty() - 0.2F;
-					switch (world.getDifficulty()) {
-						case EASY:
-							i = (int) MathHelper.clamp((5 + world.getRandom().nextInt(5)) * difficultScale, 1, 20);
+				if (world.getRandom().nextFloat() < (0.005F * world.getDifficulty().getId()) + world.getLocalDifficulty(this.getBlockPos()).getLocalDifficulty() * 0.025F) {
+					if (!world.isClient()) {
+						int i = 0;
+						float difficultScale = world.getLocalDifficulty(this.getBlockPos()).getLocalDifficulty() - 0.2F;
+						switch (world.getDifficulty()) {
+							case EASY:
+								i = (int) MathHelper.clamp((5 + world.getRandom().nextInt(5)) * difficultScale, 1, 20);
 
-							MobEnchantUtils.addRandomEnchantmentToEntity(this, this.getEnchantCap(), world.getRandom(), i, true);
-							break;
-						case NORMAL:
-							i = (int) MathHelper.clamp((5 + world.getRandom().nextInt(5)) * difficultScale, 1, 40);
+								MobEnchantUtils.addRandomEnchantmentToEntity(this, this.getEnchantCap(), world.getRandom(), i, true);
+								break;
+							case NORMAL:
+								i = (int) MathHelper.clamp((5 + world.getRandom().nextInt(5)) * difficultScale, 1, 40);
 
-							MobEnchantUtils.addRandomEnchantmentToEntity(this, this.getEnchantCap(), world.getRandom(), i, true);
-							break;
-						case HARD:
-							i = (int) MathHelper.clamp((5 + world.getRandom().nextInt(10)) * difficultScale, 1, 50);
+								MobEnchantUtils.addRandomEnchantmentToEntity(this, this.getEnchantCap(), world.getRandom(), i, true);
+								break;
+							case HARD:
+								i = (int) MathHelper.clamp((5 + world.getRandom().nextInt(10)) * difficultScale, 1, 50);
 
-							MobEnchantUtils.addRandomEnchantmentToEntity(this, this.getEnchantCap(), world.getRandom(), i, true);
-							break;
+								MobEnchantUtils.addRandomEnchantmentToEntity(this, this.getEnchantCap(), world.getRandom(), i, true);
+								break;
+						}
+
+						this.setHealth(this.getMaxHealth());
 					}
-
-					this.setHealth(this.getMaxHealth());
 				}
 
 			}

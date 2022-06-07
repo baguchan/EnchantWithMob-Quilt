@@ -1,7 +1,6 @@
 package baguchan.enchantwithmob.capability;
 
 import baguchan.enchantwithmob.mobenchant.MobEnchant;
-import baguchan.enchantwithmob.network.S2CSyncMobEnchants;
 import baguchan.enchantwithmob.utils.MobEnchantUtils;
 import com.google.common.collect.Lists;
 import net.minecraft.entity.LivingEntity;
@@ -39,9 +38,9 @@ public class MobEnchantCapability {
 		this.mobEnchants.add(new MobEnchantHandler(mobEnchant, enchantLevel));
 		this.onNewEnchantEffect(entity, mobEnchant, enchantLevel);
 		//Sync Client Enchant
-		if (!entity.world.isClient()) {
+		/*if (!entity.world.isClient()) {
 			S2CSyncMobEnchants.createPacket(entity, this.mobEnchants);
-		}
+		}*/
 		//size changed like minecraft dungeons
 		//entity.refreshDimensions();
 	}
@@ -59,9 +58,9 @@ public class MobEnchantCapability {
 		this.mobEnchants.add(new MobEnchantHandler(mobEnchant, enchantLevel));
 		this.onNewEnchantEffect(entity, mobEnchant, enchantLevel);
 		//Sync Client Enchant
-		if (!entity.world.isClient()) {
+		/*if (!entity.world.isClient()) {
 			S2CSyncMobEnchants.createPacket(entity, this.mobEnchants);
-		}
+		}*/
 		//size changed like minecraft dungeons
 		//entity.refreshDimensions();
 	}
@@ -94,9 +93,9 @@ public class MobEnchantCapability {
 			this.onRemoveEnchantEffect(entity, mobEnchants.get(i).getMobEnchant());
 		}
 		//Sync Client Enchant
-		if (!entity.world.isClient()) {
+		/*if (!entity.world.isClient()) {
 			S2CSyncMobEnchants.createPacket(entity, this.mobEnchants);
-		}
+		}*/
 		this.mobEnchants.removeAll(mobEnchants);
 		//size changed like minecraft dungeons
 		//entity.refreshDimensions();
@@ -110,9 +109,9 @@ public class MobEnchantCapability {
 			this.onRemoveEnchantEffect(entity, mobEnchants.get(i).getMobEnchant());
 		}
 		//Sync Client Enchant
-		if (!entity.world.isClient()) {
+		/*if (!entity.world.isClient()) {
 			S2CSyncMobEnchants.createPacket(entity, this.mobEnchants);
-		}
+		}*/
 		this.mobEnchants.removeAll(mobEnchants);
 		this.removeOwner(entity);
 		//size changed like minecraft dungeons
