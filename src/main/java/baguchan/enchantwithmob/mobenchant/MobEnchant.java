@@ -2,35 +2,21 @@ package baguchan.enchantwithmob.mobenchant;
 
 import baguchan.enchantwithmob.registry.ModRegistry;
 import com.google.common.collect.Maps;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.AttributeContainer;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.util.Util;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.Util;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
 public class MobEnchant {
-	private final Map<EntityAttribute, EntityAttributeModifier> attributeModifiers = Maps.newHashMap();
+	private final Map<Attribute, AttributeModifier> attributeModifierMap = Maps.newHashMap();
 	protected final Rarity enchantType;
 	private final int level;
 	private int minlevel = 1;
-
-	@Nullable
-	private String translationKey;
-
-	@Nullable
-	public static MobEnchant byRawId(int rawId) {
-		return (MobEnchant) ModRegistry.MOB_ENCHANT.get(rawId);
-	}
-
-	public static int getRawId(MobEnchant type) {
-		return ModRegistry.MOB_ENCHANT.getRawId(type);
-	}
 
 
 	public MobEnchant(Properties properties) {
@@ -46,18 +32,6 @@ public class MobEnchant {
 		this.minlevel = level;
 
 		return this;
-	}
-
-	protected String loadTranslationKey() {
-		if (this.translationKey == null) {
-			this.translationKey = Util.createTranslationKey("mob_enchant", ModRegistry.MOB_ENCHANT.getId(this));
-		}
-
-		return this.translationKey;
-	}
-
-	public String getTranslationKey() {
-		return this.loadTranslationKey();
 	}
 
 
@@ -111,51 +85,40 @@ public class MobEnchant {
 		return this != ench;
 	}
 
-	public MobEnchant addAttributeModifier(EntityAttribute attribute, String uuid, double amount, EntityAttributeModifier.Operation operation) {
-		EntityAttributeModifier entityAttributeModifier = new EntityAttributeModifier(UUID.fromString(uuid), this::getTranslationKey, amount, operation);
-		this.attributeModifiers.put(attribute, entityAttributeModifier);
+	public MobEnchant addAttributesModifier(Attribute attributeIn, String uuid, double amount, AttributeModifier.Operation operation) {
+		AttributeModifier attributemodifier = new AttributeModifier(UUID.fromString(uuid), Util.makeDescriptionId("mobenchant", ModRegistry.MOB_ENCHANT.getKey(this)), amount, operation);
+		this.attributeModifierMap.put(attributeIn, attributemodifier);
 		return this;
 	}
 
-	public Map<EntityAttribute, EntityAttributeModifier> getAttributeModifiers() {
-		return this.attributeModifiers;
+	public Map<Attribute, AttributeModifier> getAttributeModifierMap() {
+		return this.attributeModifierMap;
 	}
 
-	public void onRemoved(AttributeContainer attributes) {
-		Iterator var4 = this.attributeModifiers.entrySet().iterator();
-
-		while (var4.hasNext()) {
-			Map.Entry<EntityAttribute, EntityAttributeModifier> entry = (Map.Entry) var4.next();
-			EntityAttributeInstance entityAttributeInstance = attributes.getCustomInstance((EntityAttribute) entry.getKey());
-			if (entityAttributeInstance != null) {
-				entityAttributeInstance.removeModifier((EntityAttributeModifier) entry.getValue());
+	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeMap attributeMapIn) {
+		for (Map.Entry<Attribute, AttributeModifier> entry : this.attributeModifierMap.entrySet()) {
+			AttributeInstance modifiableattributeinstance = attributeMapIn.getInstance(entry.getKey());
+			if (modifiableattributeinstance != null) {
+				modifiableattributeinstance.removeModifier(entry.getValue());
 			}
 		}
 
 	}
 
-	public void onApplied(LivingEntity entity, AttributeContainer attributes, int amplifier) {
-		Iterator var4 = this.attributeModifiers.entrySet().iterator();
-
-		while (var4.hasNext()) {
-			Map.Entry<EntityAttribute, EntityAttributeModifier> entry = (Map.Entry) var4.next();
-			EntityAttributeInstance entityAttributeInstance = attributes.getCustomInstance((EntityAttribute) entry.getKey());
-			if (entityAttributeInstance != null) {
-				EntityAttributeModifier entityAttributeModifier = (EntityAttributeModifier) entry.getValue();
-				entityAttributeInstance.removeModifier(entityAttributeModifier);
-				entityAttributeInstance.addPersistentModifier(new EntityAttributeModifier(entityAttributeModifier.getId(), this.getTranslationKey() + " " + amplifier, this.adjustModifierAmount(amplifier, entityAttributeModifier), entityAttributeModifier.getOperation()));
+	public void applyAttributesModifiersToEntity(LivingEntity entityLivingBaseIn, AttributeMap attributeMapIn, int amplifier) {
+		for (Map.Entry<Attribute, AttributeModifier> entry : this.attributeModifierMap.entrySet()) {
+			AttributeInstance modifiableattributeinstance = attributeMapIn.getInstance(entry.getKey());
+			if (modifiableattributeinstance != null) {
+				AttributeModifier attributemodifier = entry.getValue();
+				modifiableattributeinstance.removeModifier(attributemodifier);
+				modifiableattributeinstance.addPermanentModifier(new AttributeModifier(attributemodifier.getId(), ModRegistry.MOB_ENCHANT.getKey(this).toString() + " " + amplifier, this.getAttributeModifierAmount(amplifier, attributemodifier), attributemodifier.getOperation()));
 			}
 		}
-
 	}
 
-	public double adjustModifierAmount(int amplifier, EntityAttributeModifier modifier) {
-		return modifier.getValue() * (double) (amplifier + 1);
+	public double getAttributeModifierAmount(int amplifier, AttributeModifier modifier) {
+		return modifier.getAmount() * (double) (amplifier);
 	}
-
-	/*public boolean isDisabled() {
-		return EnchantConfig.COMMON.DISABLE_ENCHANTS.get().contains(this.getRegistryName().toString());
-	}*/
 
 
 	public static class Properties {

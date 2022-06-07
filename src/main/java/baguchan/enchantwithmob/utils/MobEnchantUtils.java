@@ -7,14 +7,14 @@ import baguchan.enchantwithmob.registry.ModItems;
 import baguchan.enchantwithmob.registry.ModRegistry;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-import net.minecraft.util.collection.Weighting;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.Util;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.util.random.WeightedRandom;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -27,26 +27,15 @@ public class MobEnchantUtils {
 	public static final String TAG_ENCHANT_LEVEL = "EnchantLevel";
 	public static final String TAG_STORED_MOBENCHANTS = "StoredMobEnchants";
 
-/*	//when projectile Shooter has mob enchant, start Runnable
-	public static void executeIfPresent(LivingEntity entity, MobEnchant mobEnchantment, Runnable runnable) {
-		if (entity != null) {
-			entity.getCapability(EnchantWithMob.MOB_ENCHANT_CAP).ifPresent(cap -> {
-				if (MobEnchantUtils.findMobEnchantFromHandler(cap.getModRegistry(), mobEnchantment)) {
-					runnable.run();
-				}
-			});
-		}
-	}*/
-
 	/**
 	 * get MobEnchant From NBT
 	 *
 	 * @param tag nbt tag
 	 */
 	@Nullable
-	public static MobEnchant getEnchantFromNBT(@Nullable NbtCompound tag) {
-		if (tag != null && ModRegistry.MOB_ENCHANT.containsId(Identifier.tryParse(tag.getString(TAG_MOBENCHANT)))) {
-			return ModRegistry.MOB_ENCHANT.get(Identifier.tryParse(tag.getString(TAG_MOBENCHANT)));
+	public static MobEnchant getEnchantFromNBT(@Nullable CompoundTag tag) {
+		if (tag != null && ModRegistry.MOB_ENCHANT.containsKey(ResourceLocation.tryParse(tag.getString(TAG_MOBENCHANT)))) {
+			return ModRegistry.MOB_ENCHANT.get(ResourceLocation.tryParse(tag.getString(TAG_MOBENCHANT)));
 		} else {
 			return null;
 		}
@@ -57,7 +46,7 @@ public class MobEnchantUtils {
 	 *
 	 * @param tag nbt tag
 	 */
-	public static int getEnchantLevelFromNBT(@Nullable NbtCompound tag) {
+	public static int getEnchantLevelFromNBT(@Nullable CompoundTag tag) {
 		if (tag != null) {
 			return tag.getInt(TAG_ENCHANT_LEVEL);
 		} else {
@@ -72,16 +61,16 @@ public class MobEnchantUtils {
 	 */
 	@Nullable
 	public static MobEnchant getEnchantFromString(@Nullable String id) {
-		if (id != null && ModRegistry.MOB_ENCHANT.containsId(Identifier.tryParse(id))) {
-			return ModRegistry.MOB_ENCHANT.get(Identifier.tryParse(id));
+		if (id != null && ModRegistry.MOB_ENCHANT.containsKey(ResourceLocation.tryParse(id))) {
+			return ModRegistry.MOB_ENCHANT.get(ResourceLocation.tryParse(id));
 		} else {
 			return null;
 		}
 	}
 
 	@Nullable
-	public static MobEnchant getEnchantFromIdentifier(@Nullable Identifier id) {
-		if (id != null && ModRegistry.MOB_ENCHANT.containsId(id)) {
+	public static MobEnchant getEnchantFromResourceLocation(@Nullable ResourceLocation id) {
+		if (id != null && ModRegistry.MOB_ENCHANT.containsKey(id)) {
 			return ModRegistry.MOB_ENCHANT.get(id);
 		} else {
 			return null;
@@ -94,7 +83,7 @@ public class MobEnchantUtils {
 	 * @param stack MobEnchanted Item
 	 */
 	public static boolean hasMobEnchant(ItemStack stack) {
-		NbtCompound compoundnbt = stack.getNbt();
+		CompoundTag compoundnbt = stack.getTag();
 		return compoundnbt != null && compoundnbt.contains(TAG_STORED_MOBENCHANTS);
 	}
 
@@ -103,8 +92,8 @@ public class MobEnchantUtils {
 	 *
 	 * @param compoundnbt nbt tag
 	 */
-	public static NbtList getEnchantmentListForNBT(NbtCompound compoundnbt) {
-		return compoundnbt != null ? compoundnbt.getList(TAG_STORED_MOBENCHANTS, 10) : new NbtList();
+	public static ListTag getEnchantmentListForNBT(CompoundTag compoundnbt) {
+		return compoundnbt != null ? compoundnbt.getList(TAG_STORED_MOBENCHANTS, 10) : new ListTag();
 	}
 
 	/**
@@ -113,24 +102,24 @@ public class MobEnchantUtils {
 	 * @param stack MobEnchanted Item
 	 */
 	public static Map<MobEnchant, Integer> getEnchantments(ItemStack stack) {
-		NbtList listnbt = getEnchantmentListForNBT(stack.getNbt());
+		ListTag listnbt = getEnchantmentListForNBT(stack.getTag());
 		return makeMobEnchantListFromListNBT(listnbt);
 	}
 
 	/**
 	 * set Mob Enchantments From ItemStack
 	 *
-	 * @param enchMap ModRegistry and those level map
+	 * @param enchMap MobEnchants and those level map
 	 * @param stack   MobEnchanted Item
 	 */
 	public static void setEnchantments(Map<MobEnchant, Integer> enchMap, ItemStack stack) {
-		NbtList listnbt = new NbtList();
+		ListTag listnbt = new ListTag();
 
 		for (Map.Entry<MobEnchant, Integer> entry : enchMap.entrySet()) {
 			MobEnchant enchantment = entry.getKey();
 			if (enchantment != null) {
 				int i = entry.getValue();
-				NbtCompound compoundnbt = new NbtCompound();
+				CompoundTag compoundnbt = new CompoundTag();
 				compoundnbt.putString(TAG_MOBENCHANT, String.valueOf((Object) ModRegistry.MOB_ENCHANT.getKey(enchantment)));
 				compoundnbt.putShort(TAG_ENCHANT_LEVEL, (short) i);
 				listnbt.add(compoundnbt);
@@ -141,15 +130,15 @@ public class MobEnchantUtils {
 		}
 
 		if (listnbt.isEmpty()) {
-			stack.removeSubNbt(TAG_STORED_MOBENCHANTS);
+			stack.removeTagKey(TAG_STORED_MOBENCHANTS);
 		}
 	}
 
-	private static Map<MobEnchant, Integer> makeMobEnchantListFromListNBT(NbtList p_226652_0_) {
+	private static Map<MobEnchant, Integer> makeMobEnchantListFromListNBT(ListTag p_226652_0_) {
 		Map<MobEnchant, Integer> map = Maps.newLinkedHashMap();
 
 		for (int i = 0; i < p_226652_0_.size(); ++i) {
-			NbtCompound compoundnbt = p_226652_0_.getCompound(i);
+			CompoundTag compoundnbt = p_226652_0_.getCompound(i);
 			MobEnchant mobEnchant = getEnchantFromString(compoundnbt.getString(TAG_MOBENCHANT));
 			map.put(mobEnchant, compoundnbt.getInt(TAG_ENCHANT_LEVEL));
 
@@ -160,15 +149,15 @@ public class MobEnchantUtils {
 
 	//add MobEnchantToItemstack (example,this method used to MobEnchantBook)
 	public static void addMobEnchantToItemStack(ItemStack itemIn, MobEnchant mobenchant, int level) {
-		NbtList listnbt = getEnchantmentListForNBT(itemIn.getNbt());
+		ListTag listnbt = getEnchantmentListForNBT(itemIn.getTag());
 
 		boolean flag = true;
-		Identifier resourcelocation = ModRegistry.MOB_ENCHANT.getKey(mobenchant).get().getValue();
+		ResourceLocation resourcelocation = ModRegistry.MOB_ENCHANT.getKey(mobenchant);
 
 
 		for (int i = 0; i < listnbt.size(); ++i) {
-			NbtCompound compoundnbt = listnbt.getCompound(i);
-			Identifier resourcelocation1 = Identifier.tryParse(compoundnbt.getString("MobEnchant"));
+			CompoundTag compoundnbt = listnbt.getCompound(i);
+			ResourceLocation resourcelocation1 = ResourceLocation.tryParse(compoundnbt.getString("MobEnchant"));
 			if (resourcelocation1 != null && resourcelocation1.equals(resourcelocation)) {
 				if (compoundnbt.getInt(TAG_ENCHANT_LEVEL) < level) {
 					compoundnbt.putInt(TAG_ENCHANT_LEVEL, level);
@@ -180,16 +169,16 @@ public class MobEnchantUtils {
 		}
 
 		if (flag) {
-			NbtCompound compoundnbt1 = new NbtCompound();
+			CompoundTag compoundnbt1 = new CompoundTag();
 			compoundnbt1.putString(TAG_MOBENCHANT, String.valueOf((Object) resourcelocation));
 			compoundnbt1.putInt(TAG_ENCHANT_LEVEL, level);
 			listnbt.add(compoundnbt1);
 		}
 
-		itemIn.getNbt().put(TAG_STORED_MOBENCHANTS, listnbt);
-	}
+		itemIn.getTag().put(TAG_STORED_MOBENCHANTS, listnbt);
+    }
 
-	/**
+    /**
 	 * add Mob Enchantments From ItemStack
 	 *
 	 * @param itemIn     MobEnchanted Item
@@ -197,11 +186,11 @@ public class MobEnchantUtils {
 	 * @param capability MobEnchant Capability
 	 */
 	public static boolean addItemMobEnchantToEntity(ItemStack itemIn, LivingEntity entity, MobEnchantCapability capability) {
-		NbtList listnbt = getEnchantmentListForNBT(itemIn.getNbt());
+		ListTag listnbt = getEnchantmentListForNBT(itemIn.getTag());
 		boolean flag = false;
 
 		for (int i = 0; i < listnbt.size(); ++i) {
-			NbtCompound compoundnbt = listnbt.getCompound(i);
+			CompoundTag compoundnbt = listnbt.getCompound(i);
 			if (checkAllowMobEnchantFromMob(MobEnchantUtils.getEnchantFromNBT(compoundnbt), entity, capability)) {
 				capability.addMobEnchant(entity, MobEnchantUtils.getEnchantFromNBT(compoundnbt), MobEnchantUtils.getEnchantLevelFromNBT(compoundnbt));
 				flag = true;
@@ -346,27 +335,27 @@ public class MobEnchantUtils {
 		} else {
 			level = level + 1 + randomIn.nextInt(i / 4 + 1) + randomIn.nextInt(i / 4 + 1);
 			float f = (randomIn.nextFloat() + randomIn.nextFloat() - 1.0F) * 0.15F;
-			level = MathHelper.clamp(Math.round((float) level + (float) level * f), 1, Integer.MAX_VALUE);
+			level = Mth.clamp(Math.round((float) level + (float) level * f), 1, Integer.MAX_VALUE);
 			List<MobEnchantmentData> list1 = makeMobEnchantmentDatas(level, allowTresure);
 			if (!list1.isEmpty()) {
-				Weighting.getRandom(randomIn, list1).ifPresent(list::add);
+				WeightedRandom.getRandomItem(randomIn, list1).ifPresent(list::add);
 
 				while (randomIn.nextInt(50) <= level) {
 					if (!list.isEmpty()) {
-						removeIncompatible(list1, Util.getLast(list));
+						removeIncompatible(list1, Util.lastOf(list));
 					}
 					if (list1.isEmpty()) {
 						break;
 					}
 
-					Weighting.getRandom(randomIn, list1).ifPresent(list::add);
+					WeightedRandom.getRandomItem(randomIn, list1).ifPresent(list::add);
 					level /= 2;
 				}
 			}
 
 			return list;
 		}
-	}
+    }
 
 	/*
 	 * get MobEnchantment data.
@@ -375,8 +364,7 @@ public class MobEnchantUtils {
 	public static List<MobEnchantmentData> makeMobEnchantmentDatas(int p_185291_0_, boolean allowTresure) {
 		List<MobEnchantmentData> list = Lists.newArrayList();
 
-		for (Identifier identifier : ModRegistry.MOB_ENCHANT.getIds()) {
-			MobEnchant enchantment = ModRegistry.MOB_ENCHANT.get(identifier);
+		for (MobEnchant enchantment : ModRegistry.MOB_ENCHANT.stream().toList()) {
 			if ((!enchantment.isTresureEnchant() || allowTresure) && !enchantment.isOnlyChest()) {
 				for (int i = enchantment.getMaxLevel(); i > enchantment.getMinLevel() - 1; --i) {
 					if (p_185291_0_ >= enchantment.getMinEnchantability(i) && p_185291_0_ <= enchantment.getMaxEnchantability(i)) {
@@ -396,8 +384,8 @@ public class MobEnchantUtils {
 		while (iterator.hasNext()) {
 			if (!data.enchantment.isCompatibleWith((iterator.next()).enchantment)) {
 				iterator.remove();
-			}
-		}
+            }
+        }
 
-	}
+    }
 }

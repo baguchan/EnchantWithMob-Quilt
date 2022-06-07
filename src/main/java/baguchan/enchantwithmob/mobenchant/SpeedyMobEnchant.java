@@ -1,7 +1,7 @@
 package baguchan.enchantwithmob.mobenchant;
 
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 
 public class SpeedyMobEnchant extends MobEnchant {
 	public SpeedyMobEnchant(Properties properties) {

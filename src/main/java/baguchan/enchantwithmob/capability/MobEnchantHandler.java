@@ -4,7 +4,7 @@ package baguchan.enchantwithmob.capability;
 import baguchan.enchantwithmob.mobenchant.MobEnchant;
 import baguchan.enchantwithmob.registry.ModRegistry;
 import baguchan.enchantwithmob.utils.MobEnchantUtils;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public class MobEnchantHandler {
 	private MobEnchant mobEnchant;
@@ -24,18 +24,18 @@ public class MobEnchantHandler {
 		return enchantLevel;
 	}
 
-	public NbtCompound writeNBT() {
-		NbtCompound nbt = new NbtCompound();
+	public CompoundTag writeNBT() {
+		CompoundTag nbt = new CompoundTag();
 
 		if (mobEnchant != null) {
-			nbt.putString("MobEnchant", ModRegistry.MOB_ENCHANT.getId(mobEnchant).toString());
+			nbt.putString("MobEnchant", ModRegistry.MOB_ENCHANT.getKey(mobEnchant).toString());
 			nbt.putInt("EnchantLevel", enchantLevel);
 		}
 
 		return nbt;
 	}
 
-	public void readNBT(NbtCompound nbt) {
+	public void readNBT(CompoundTag nbt) {
 		mobEnchant = MobEnchantUtils.getEnchantFromNBT(nbt);
 		enchantLevel = MobEnchantUtils.getEnchantLevelFromNBT(nbt);
 	}

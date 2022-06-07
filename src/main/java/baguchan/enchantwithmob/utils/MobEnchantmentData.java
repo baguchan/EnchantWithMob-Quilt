@@ -1,9 +1,9 @@
 package baguchan.enchantwithmob.utils;
 
 import baguchan.enchantwithmob.mobenchant.MobEnchant;
-import net.minecraft.util.collection.Weighted;
+import net.minecraft.util.random.WeightedEntry;
 
-public class MobEnchantmentData extends Weighted.Absent {
+public class MobEnchantmentData extends WeightedEntry.IntrusiveBase {
 	public final MobEnchant enchantment;
 	public final int enchantmentLevel;
 

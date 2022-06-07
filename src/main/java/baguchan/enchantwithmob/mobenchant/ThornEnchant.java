@@ -1,8 +1,8 @@
 package baguchan.enchantwithmob.mobenchant;
 
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.GuardianEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Guardian;
 
 public class ThornEnchant extends MobEnchant {
 	public ThornEnchant(Properties properties) {
@@ -19,6 +19,6 @@ public class ThornEnchant extends MobEnchant {
 
 	@Override
 	public boolean isCompatibleMob(LivingEntity livingEntity) {
-		return !(livingEntity instanceof GuardianEntity);
+		return !(livingEntity instanceof Guardian);
 	}
 }

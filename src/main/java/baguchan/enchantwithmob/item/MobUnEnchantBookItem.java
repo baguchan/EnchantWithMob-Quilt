@@ -1,54 +1,53 @@
 package baguchan.enchantwithmob.item;
 
-import baguchan.enchantwithmob.api.IEnchantCap;
-import baguchan.enchantwithmob.utils.MobEnchantUtils;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.world.World;
+import com.baguchan.enchantwithmob.EnchantWithMob;
+import com.baguchan.enchantwithmob.utils.MobEnchantUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class MobUnEnchantBookItem extends Item {
-	public MobUnEnchantBookItem(Settings group) {
+	public MobUnEnchantBookItem(Properties group) {
 		super(group);
 	}
 
 	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-		ItemStack stack = user.getStackInHand(hand);
+	public InteractionResultHolder<ItemStack> use(Level level, Player playerIn, InteractionHand handIn) {
+		ItemStack stack = playerIn.getItemInHand(handIn);
+		playerIn.getCapability(EnchantWithMob.MOB_ENCHANT_CAP).ifPresent(cap ->
+		{
+			MobEnchantUtils.removeMobEnchantToEntity(playerIn, cap);
+		});
+		playerIn.playSound(SoundEvents.ENCHANTMENT_TABLE_USE, 1.0F, 1.0F);
 
-		if (user instanceof IEnchantCap) {
-			MobEnchantUtils.removeMobEnchantToEntity(user, ((IEnchantCap) user).getEnchantCap());
-		}
-		user.playSound(SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, 1.0F, 1.0F);
+		stack.hurtAndBreak(1, playerIn, (entity) -> entity.broadcastBreakEvent(handIn));
 
-		stack.damage(1, user, (entity) -> entity.sendToolBreakStatus(hand));
+		playerIn.getCooldowns().addCooldown(stack.getItem(), 80);
 
-		user.getItemCooldownManager().set(stack.getItem(), 80);
-
-		return TypedActionResult.success(stack);
+		return InteractionResultHolder.success(stack);
 	}
 
 	@Override
-	public void appendTooltip(ItemStack stack, @org.jetbrains.annotations.Nullable World world, List<Text> tooltip, TooltipContext context) {
-		super.appendTooltip(stack, world, tooltip, context);
-		Formatting[] textformatting2 = new Formatting[]{Formatting.DARK_PURPLE};
+	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag p_41424_) {
+		super.appendHoverText(stack, level, tooltip, p_41424_);
+		ChatFormatting[] textformatting2 = new ChatFormatting[]{ChatFormatting.DARK_PURPLE};
 
-		tooltip.add(new TranslatableText("mobenchant.enchantwithmob.mob_unenchant_book.tooltip").formatted(textformatting2));
-
+		tooltip.add(new TranslatableComponent("mobenchant.enchantwithmob.mob_unenchant_book.tooltip").withStyle(textformatting2));
 	}
 
-
 	@Override
-	public boolean hasGlint(ItemStack stack) {
+	public boolean isFoil(ItemStack p_77636_1_) {
 		return true;
 	}
 }

@@ -4,7 +4,7 @@ import baguchan.enchantwithmob.EnchantWithMob;
 import baguchan.enchantwithmob.mobenchant.*;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 
 public class MobEnchants {
@@ -16,11 +16,11 @@ public class MobEnchants {
 	public static final MobEnchant HEALTH_BOOST = new HealthBoostMobEnchant(new MobEnchant.Properties(MobEnchant.Rarity.VERY_RARE, 5)).addAttributeModifier(EntityAttributes.GENERIC_MAX_HEALTH, "f5d32c9f-2a3d-4157-bbf7-469d348ce097", 2.0D, EntityAttributeModifier.Operation.ADDITION);
 
 	public static void init() {
-		Registry.register(ModRegistry.MOB_ENCHANT, new Identifier(EnchantWithMob.MODID, "protection"), PROTECTION);
-		Registry.register(ModRegistry.MOB_ENCHANT, new Identifier(EnchantWithMob.MODID, "tough"), TOUGH);
-		Registry.register(ModRegistry.MOB_ENCHANT, new Identifier(EnchantWithMob.MODID, "speedy"), SPEEDY);
-		Registry.register(ModRegistry.MOB_ENCHANT, new Identifier(EnchantWithMob.MODID, "strong"), STRONG);
-		Registry.register(ModRegistry.MOB_ENCHANT, new Identifier(EnchantWithMob.MODID, "thorn"), THORN);
-		Registry.register(ModRegistry.MOB_ENCHANT, new Identifier(EnchantWithMob.MODID, "health_boost"), HEALTH_BOOST);
+		Registry.register(ModRegistry.MOB_ENCHANT, new ResourceLocation(EnchantWithMob.MODID, "protection"), PROTECTION);
+		Registry.register(ModRegistry.MOB_ENCHANT, new ResourceLocation(EnchantWithMob.MODID, "tough"), TOUGH);
+		Registry.register(ModRegistry.MOB_ENCHANT, new ResourceLocation(EnchantWithMob.MODID, "speedy"), SPEEDY);
+		Registry.register(ModRegistry.MOB_ENCHANT, new ResourceLocation(EnchantWithMob.MODID, "strong"), STRONG);
+		Registry.register(ModRegistry.MOB_ENCHANT, new ResourceLocation(EnchantWithMob.MODID, "thorn"), THORN);
+		Registry.register(ModRegistry.MOB_ENCHANT, new ResourceLocation(EnchantWithMob.MODID, "health_boost"), HEALTH_BOOST);
 	}
 }
