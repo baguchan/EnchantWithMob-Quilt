@@ -4,7 +4,6 @@ import baguchan.enchantwithmob.api.IEnchantCap;
 import baguchan.enchantwithmob.utils.MobEnchantUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -42,7 +41,7 @@ public class MobUnEnchantBookItem extends Item {
 		super.appendHoverText(stack, level, tooltip, p_41424_);
 		ChatFormatting[] textformatting2 = new ChatFormatting[]{ChatFormatting.DARK_PURPLE};
 
-		tooltip.add(new TranslatableComponent("mobenchant.enchantwithmob.mob_unenchant_book.tooltip").withStyle(textformatting2));
+		tooltip.add(Component.translatable("mobenchant.enchantwithmob.mob_unenchant_book.tooltip").withStyle(textformatting2));
 	}
 
 	@Override
