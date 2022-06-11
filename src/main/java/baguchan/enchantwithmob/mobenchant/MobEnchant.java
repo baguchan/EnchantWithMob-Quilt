@@ -8,7 +8,9 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,6 +20,8 @@ public class MobEnchant {
 	private final int level;
 	private int minlevel = 1;
 
+	@Nullable
+	private String descriptionId;
 
 	public MobEnchant(Properties properties) {
 		this.enchantType = properties.enchantType;
@@ -85,35 +89,55 @@ public class MobEnchant {
 		return this != ench;
 	}
 
-	public MobEnchant addAttributesModifier(Attribute attributeIn, String uuid, double amount, AttributeModifier.Operation operation) {
-		AttributeModifier attributemodifier = new AttributeModifier(UUID.fromString(uuid), Util.makeDescriptionId("mobenchant", ModRegistry.MOB_ENCHANT.getKey(this)), amount, operation);
-		this.attributeModifierMap.put(attributeIn, attributemodifier);
+	protected String getOrCreateDescriptionId() {
+		if (this.descriptionId == null) {
+			this.descriptionId = Util.makeDescriptionId("mob_enchant", ModRegistry.MOB_ENCHANT.getKey(this));
+		}
+
+		return this.descriptionId;
+	}
+
+	public String getDescriptionId() {
+		return this.getOrCreateDescriptionId();
+	}
+
+
+	public MobEnchant addAttributeModifier(Attribute attribute, String uuid, double amount, AttributeModifier.Operation operation) {
+		AttributeModifier attributeModifier = new AttributeModifier(UUID.fromString(uuid), this::getDescriptionId, amount, operation);
+		this.attributeModifierMap.put(attribute, attributeModifier);
 		return this;
 	}
 
-	public Map<Attribute, AttributeModifier> getAttributeModifierMap() {
+	public Map<Attribute, AttributeModifier> getAttributeModifiers() {
 		return this.attributeModifierMap;
 	}
 
-	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeMap attributeMapIn) {
-		for (Map.Entry<Attribute, AttributeModifier> entry : this.attributeModifierMap.entrySet()) {
-			AttributeInstance modifiableattributeinstance = attributeMapIn.getInstance(entry.getKey());
-			if (modifiableattributeinstance != null) {
-				modifiableattributeinstance.removeModifier(entry.getValue());
+	public void removeAttributeModifiers(LivingEntity entity, AttributeMap attributes, int amplifier) {
+		Iterator var4 = this.attributeModifierMap.entrySet().iterator();
+
+		while (var4.hasNext()) {
+			Map.Entry<Attribute, AttributeModifier> entry = (Map.Entry) var4.next();
+			AttributeInstance attributeInstance = attributes.getInstance((Attribute) entry.getKey());
+			if (attributeInstance != null) {
+				attributeInstance.removeModifier((AttributeModifier) entry.getValue());
 			}
 		}
 
 	}
 
-	public void applyAttributesModifiersToEntity(LivingEntity entityLivingBaseIn, AttributeMap attributeMapIn, int amplifier) {
-		for (Map.Entry<Attribute, AttributeModifier> entry : this.attributeModifierMap.entrySet()) {
-			AttributeInstance modifiableattributeinstance = attributeMapIn.getInstance(entry.getKey());
-			if (modifiableattributeinstance != null) {
-				AttributeModifier attributemodifier = entry.getValue();
-				modifiableattributeinstance.removeModifier(attributemodifier);
-				modifiableattributeinstance.addPermanentModifier(new AttributeModifier(attributemodifier.getId(), ModRegistry.MOB_ENCHANT.getKey(this).toString() + " " + amplifier, this.getAttributeModifierAmount(amplifier, attributemodifier), attributemodifier.getOperation()));
+	public void addAttributeModifiers(LivingEntity entity, AttributeMap attributes, int amplifier) {
+		Iterator var4 = this.attributeModifierMap.entrySet().iterator();
+
+		while (var4.hasNext()) {
+			Map.Entry<Attribute, AttributeModifier> entry = (Map.Entry) var4.next();
+			AttributeInstance attributeInstance = attributes.getInstance((Attribute) entry.getKey());
+			if (attributeInstance != null) {
+				AttributeModifier attributeModifier = (AttributeModifier) entry.getValue();
+				attributeInstance.removeModifier(attributeModifier);
+				attributeInstance.addPermanentModifier(new AttributeModifier(attributeModifier.getId(), this.getDescriptionId() + " " + amplifier, this.getAttributeModifierAmount(amplifier, attributeModifier), attributeModifier.getOperation()));
 			}
 		}
+
 	}
 
 	public double getAttributeModifierAmount(int amplifier, AttributeModifier modifier) {

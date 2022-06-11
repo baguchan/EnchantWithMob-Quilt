@@ -37,7 +37,7 @@ public class MobEnchantCapability {
 		this.onNewEnchantEffect(entity, mobEnchant, enchantLevel);
 		//Sync Client Enchant
 		//size changed like minecraft dungeons
-		entity.refreshDimensions();
+		//entity.refreshDimensions();
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class MobEnchantCapability {
 		this.mobEnchants.add(new MobEnchantHandler(mobEnchant, enchantLevel));
 		this.onNewEnchantEffect(entity, mobEnchant, enchantLevel);
 		//size changed like minecraft dungeons
-		entity.refreshDimensions();
+		//entity.refreshDimensions();
 	}
 
 	public void addOwner(LivingEntity entity, @Nullable LivingEntity owner) {
@@ -72,11 +72,11 @@ public class MobEnchantCapability {
 	public void removeAllMobEnchant(LivingEntity entity) {
 
 		for (int i = 0; i < mobEnchants.size(); ++i) {
-			this.onRemoveEnchantEffect(entity, mobEnchants.get(i).getMobEnchant());
+			this.onRemoveEnchantEffect(entity, mobEnchants.get(i).getMobEnchant(), mobEnchants.get(i).getEnchantLevel());
 		}
 		this.mobEnchants.removeAll(mobEnchants);
 		//size changed like minecraft dungeons
-		entity.refreshDimensions();
+		//entity.refreshDimensions();
 	}
 
 	/*
@@ -84,12 +84,12 @@ public class MobEnchantCapability {
 	 */
 	public void removeMobEnchantFromOwner(LivingEntity entity) {
 		for (int i = 0; i < mobEnchants.size(); ++i) {
-			this.onRemoveEnchantEffect(entity, mobEnchants.get(i).getMobEnchant());
+			this.onRemoveEnchantEffect(entity, mobEnchants.get(i).getMobEnchant(), mobEnchants.get(i).getEnchantLevel());
 		}
 		this.mobEnchants.removeAll(mobEnchants);
 		this.removeOwner(entity);
 		//size changed like minecraft dungeons
-		entity.refreshDimensions();
+		//entity.refreshDimensions();
 	}
 
 
@@ -98,7 +98,7 @@ public class MobEnchantCapability {
 	 */
 	public void onNewEnchantEffect(LivingEntity entity, MobEnchant enchant, int enchantLevel) {
 		if (!entity.level.isClientSide) {
-			enchant.applyAttributesModifiersToEntity(entity, entity.getAttributes(), enchantLevel);
+			enchant.addAttributeModifiers(entity, entity.getAttributes(), enchantLevel);
 
 			/*if (EnchantConfig.COMMON.dungeonsLikeHealth.get()) {
 				AttributeInstance modifiableattributeinstance = entity.getAttributes().getInstance(Attributes.MAX_HEALTH);
@@ -116,16 +116,16 @@ public class MobEnchantCapability {
 	 */
 	protected void onChangedEnchantEffect(LivingEntity entity, MobEnchant enchant, int enchantLevel) {
 		if (!entity.level.isClientSide) {
-			enchant.applyAttributesModifiersToEntity(entity, entity.getAttributes(), enchantLevel);
+			enchant.addAttributeModifiers(entity, entity.getAttributes(), enchantLevel);
 		}
 	}
 
 	/*
 	 * Remove Enchant Attribute effect
 	 */
-	protected void onRemoveEnchantEffect(LivingEntity entity, MobEnchant enchant) {
+	protected void onRemoveEnchantEffect(LivingEntity entity, MobEnchant enchant, int level) {
 		if (!entity.level.isClientSide()) {
-			enchant.removeAttributesModifiersFromEntity(entity, entity.getAttributes());
+			enchant.removeAttributeModifiers(entity, entity.getAttributes(), level);
 
 			/*AttributeInstance modifiableattributeinstance = entity.getAttributes().getInstance(Attributes.MAX_HEALTH);
 			if (modifiableattributeinstance != null) {

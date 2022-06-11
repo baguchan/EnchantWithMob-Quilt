@@ -2,14 +2,10 @@ package baguchan.enchantwithmob.mixin;
 
 import baguchan.enchantwithmob.api.IEnchantCap;
 import baguchan.enchantwithmob.capability.MobEnchantCapability;
-import baguchan.enchantwithmob.registry.MobEnchants;
 import baguchan.enchantwithmob.registry.ModTrackedDatas;
-import baguchan.enchantwithmob.utils.MobEnchantUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -52,21 +48,6 @@ public abstract class LivingEntityMixin extends Entity implements IEnchantCap {
 	@Override
 	public void setEnchantCap(MobEnchantCapability cap) {
 		this.entityData.set(MOB_ENCHANT_CAP, cap);
-	}
-
-	@Inject(method = "actuallyHurt", at = @At("HEAD"))
-	protected void actuallyHurt(DamageSource source, float amount, CallbackInfo ci) {
-		amount = getDamageAfterMobEnchantAbsorb(source, amount);
-	}
-
-	protected float getDamageAfterMobEnchantAbsorb(DamageSource source, float damage) {
-		if (source != DamageSource.STARVE) {
-			int i = MobEnchantUtils.getMobEnchantLevelFromHandler(this.getEnchantCap().getMobEnchants(), MobEnchants.PROTECTION);
-			if (i > 0) {
-				damage -= (double) Mth.floor(damage * (double) ((float) i * 0.15F));
-			}
-		}
-		return damage;
 	}
 
 	static {

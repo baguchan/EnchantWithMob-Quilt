@@ -147,7 +147,7 @@ public class MobEnchantBookItem extends Item {
 				int mobEnchantLevel = MobEnchantUtils.getEnchantLevelFromNBT(compoundnbt);
 
 				if (mobEnchant != null) {
-					Map<Attribute, AttributeModifier> map = mobEnchant.getAttributeModifierMap();
+					Map<Attribute, AttributeModifier> map = mobEnchant.getAttributeModifiers();
 					if (!map.isEmpty()) {
 						for (Map.Entry<Attribute, AttributeModifier> entry : map.entrySet()) {
 							AttributeModifier attributemodifier = entry.getValue();
