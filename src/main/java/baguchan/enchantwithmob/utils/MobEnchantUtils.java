@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +21,6 @@ import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class MobEnchantUtils {
 	public static final String TAG_MOBENCHANT = "MobEnchant";
@@ -222,7 +222,7 @@ public class MobEnchantUtils {
 	 * @param level        max limit level MobEnchant
 	 * @param allowRare    setting is allow rare enchant
 	 */
-	public static boolean addRandomEnchantmentToEntity(LivingEntity livingEntity, MobEnchantCapability capability, Random random, int level, boolean allowRare) {
+	public static boolean addRandomEnchantmentToEntity(LivingEntity livingEntity, MobEnchantCapability capability, RandomSource random, int level, boolean allowRare) {
 		List<MobEnchantmentData> list = buildEnchantmentList(random, level, allowRare);
 
 		boolean flag = false;
@@ -244,7 +244,7 @@ public class MobEnchantUtils {
 	 * @param level        max limit level MobEnchant
 	 * @param allowRare    setting is allow rare enchant
 	 */
-	public static boolean addUnstableRandomEnchantmentToEntity(LivingEntity livingEntity, LivingEntity ownerEntity, MobEnchantCapability capability, Random random, int level, boolean allowRare) {
+	public static boolean addUnstableRandomEnchantmentToEntity(LivingEntity livingEntity, LivingEntity ownerEntity, MobEnchantCapability capability, RandomSource random, int level, boolean allowRare) {
 		List<MobEnchantmentData> list = buildEnchantmentList(random, level, allowRare);
 
 		boolean flag = false;
@@ -261,7 +261,7 @@ public class MobEnchantUtils {
 		return flag;
 	}
 
-	public static ItemStack addRandomEnchantmentToItemStack(Random random, ItemStack stack, int level, boolean allowRare) {
+	public static ItemStack addRandomEnchantmentToItemStack(RandomSource random, ItemStack stack, int level, boolean allowRare) {
 		List<MobEnchantmentData> list = buildEnchantmentList(random, level, allowRare);
 
 		for (MobEnchantmentData enchantmentdata : list) {
@@ -327,7 +327,7 @@ public class MobEnchantUtils {
 	/*
 	 * build MobEnchantment list like vanilla's enchantment
 	 */
-	public static List<MobEnchantmentData> buildEnchantmentList(Random randomIn, int level, boolean allowTresure) {
+	public static List<MobEnchantmentData> buildEnchantmentList(RandomSource randomIn, int level, boolean allowTresure) {
 		List<MobEnchantmentData> list = Lists.newArrayList();
 		int i = 1; //Enchantability
 		if (i <= 0) {
